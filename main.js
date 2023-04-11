@@ -8,7 +8,8 @@ let addButton = document.getElementById("add-button");
 let tabs = document.querySelectorAll(".task-tabs div");
 let taskList = [];
 let mode = "all";
-let filterList =[];
+let inprogressList = [];
+let doneList = [];
 
 addButton.addEventListener("click", addTask);
 
@@ -29,11 +30,20 @@ function addTask(){
 
 function render(){
     let list = [];
+    // const uniqueInprogress = [...new Map(inprogressList.map((m) => [m.id, m])).values()];
+    // const uniqueDone = [...new Map(doneList.map((m) => [m.id, m])).values()];
+
+
+
+
+
     if(mode == "all"){
         list = taskList
-    } else if(mode == "inprogress" || mode == "done"){
-        list = filterList
-    } 
+    } else if(mode == "inprogress"){
+        list = inprogressList
+    } else if(mode == "done"){
+        list = doneList
+    }
 
 
     let resultHTML = '';
@@ -88,10 +98,6 @@ function toggleComplete(id){
     render();
 }
 
-function generateRandomID(){
-    return Math.random().toString(36).substr(2, 16);
-}
-
 
 // 할일 삭제하기
 
@@ -110,6 +116,26 @@ function deleteTask(id){
 // in progress를 눌렀을때 isComplete이 false인 아이템이 필터되어 보이도록
 // done를 눌렀을때 isComplete이 true인 아이템이 필터되어 보이도록
 
+// 배열 안에 id값이 중복일 경우를 찾는 function
+
+function removeDuplicates() {
+
+    for (let i = 0; i < inprogressList.length-1; i++) {
+        for (let j = 1; j < inprogressList.length; j++) {
+            if (inprogressList[i].id === inprogressList[j].id)
+            inprogressList.splice(j, 1);    
+        }
+    }
+
+    for (let i = 0; i < doneList.length-1; i++) {
+        for (let j = 1; j < doneList.length; j++) {
+            if ( doneList[i].id === doneList[j].id)
+            doneList.splice(j, 1);    
+        }
+    }
+}
+
+
 
 function filter(event){
     mode = event.target.id;
@@ -117,18 +143,22 @@ function filter(event){
     if(mode == "inprogress") {
         for(let i=0; i<taskList.length;i++){
             if(taskList[i].isComplete == false){
-                filterList.push(taskList[i]);
+                inprogressList.push(taskList[i]);
             }
         }
     } else if(mode == "done"){
         for(let i=0; i<taskList.length;i++){
             if(taskList[i].isComplete == true){
-                filterList.push(taskList[i]);
+                doneList.push(taskList[i]);
             }
         }
-        
     }
+    removeDuplicates()
     render();
-    console.log(filterList)
+    console.log(inprogressList)
+}
+
+function generateRandomID(){
+    return Math.random().toString(36).substr(2, 16);
 }
 
